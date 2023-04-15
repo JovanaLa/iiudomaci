@@ -48,7 +48,7 @@ def add_vlaznostvazduha():
     vlaznostvazduhasobe = data["vlaznostvazduhasobe"]
     soba_id = data["soba"]
     try:
-        datum = datetime.strptime(data["datum"], " %d-%m-%Y  %H:%M:%S")
+         datum = datetime.strptime(data["datum"], "%d/%m/%Y  %H:%M:%S")
     except KeyError:
         datum = datetime.now(timezone.utc)
 
@@ -58,3 +58,15 @@ def add_vlaznostvazduha():
             cursor.execute(INSERT_VV, (soba_id, vlaznostvazduhasobe, datum))
 
     return {"poruka": "Dodata vlaznost vazduha."}, 201
+
+
+@app.get("/api/prosek")
+def get_prosek():
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GLOBAL_PROSEK)
+            prosek = cursor.fetchone()[0]
+            cursor.execute(BROJ_DANA)
+            dani = cursor.fetchone()[0]
+
+    return {"prosek": round(prosek, 2), "dani": dani}
