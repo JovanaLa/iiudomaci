@@ -1,6 +1,7 @@
 from flask import Flask, request
 import os
 import psycopg2
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 
 
@@ -29,7 +30,7 @@ app = Flask(__name__)
 url = os.getenv("DATABASE_URL")
 connection = psycopg2.connect(url)
 
-@app.post("/api/room")
+@app.post("/api/soba")
 def create_soba():
     data = request.get_json()
     ime = data["ime"]
@@ -40,3 +41,20 @@ def create_soba():
             soba_id = cursor.fetchone()[0]
 
     return {"id": soba_id, "poruka": f"Soba {ime} je kreirana."}, 201
+
+@app.post("/api/vlaznostvazduha")
+def add_vlaznostvazduha():
+    data = request.get_json()
+    vlaznostvazduhasobe = data["vlaznostvazduhasobe"]
+    soba_id = data["soba"]
+    try:
+        datum = datetime.strptime(data["datum"], " %d-%m-%Y  %H:%M:%S")
+    except KeyError:
+        datum = datetime.now(timezone.utc)
+
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(CREATE_VLAZNOSTVAZDUHA_TABLE)
+            cursor.execute(INSERT_VV, (soba_id, vlaznostvazduhasobe, datum))
+
+    return {"poruka": "Dodata vlaznost vazduha."}, 201
