@@ -21,6 +21,8 @@ BROJ_DANA = (
     """SELECT COUNT(DISTINCT DATE(datum)) AS dani FROM vlaznostvazduha;"""
 )
 
+GLOBAL_PROSEK = """SELECT AVG(vlaznostvazduhasobe) as prosek FROM vlaznostvazduha;"""
+
 load_dotenv()
 
 app = Flask(__name__)
