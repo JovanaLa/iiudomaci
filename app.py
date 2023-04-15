@@ -17,6 +17,10 @@ INSERT_VV = (
     "INSERT INTO vlaznostvazduha (soba_id, vlaznostvazduhasobe, datum) VALUES (%s, %s, %s);"
 )
 
+BROJ_DANA = (
+    """SELECT COUNT(DISTINCT DATE(datum)) AS dani FROM vlaznostvazduha;"""
+)
+
 load_dotenv()
 
 app = Flask(__name__)
