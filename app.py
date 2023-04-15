@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 import os
 import psycopg2
 from dotenv import load_dotenv
@@ -29,6 +29,14 @@ app = Flask(__name__)
 url = os.getenv("DATABASE_URL")
 connection = psycopg2.connect(url)
 
-@app.get("/")
-def home():
-    return "Hello world"
+@app.post("/api/room")
+def create_soba():
+    data = request.get_json()
+    ime = data["ime"]
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(CREATE_SOBE_TABLE)
+            cursor.execute(INSERT_SOBA_RETURN_ID, (ime,))
+            soba_id = cursor.fetchone()[0]
+
+    return {"id": soba_id, "poruka": f"Soba {ime} je kreirana."}, 201
