@@ -46,7 +46,7 @@ def create_soba():
 def add_vlaznostvazduha():
     data = request.get_json()
     vlaznostvazduhasobe = data["vlaznostvazduhasobe"]
-    soba_id = data["soba"]
+    soba_id = data["soba_id"]
     try:
          datum = datetime.strptime(data["datum"], "%d/%m/%Y  %H:%M:%S")
     except KeyError:
@@ -70,3 +70,6 @@ def get_prosek():
             dani = cursor.fetchone()[0]
 
     return {"prosek": round(prosek, 2), "dani": dani}
+
+if __name__ == "__main__":
+    app.run(debug=True ,port=8080,use_reloader=False)
