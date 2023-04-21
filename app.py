@@ -17,11 +17,15 @@ INSERT_SOBA_RETURN_ID = "INSERT INTO sobe (ime) VALUES (%s) RETURNING id;"
 INSERT_VV = (
     "INSERT INTO vlaznostvazduha (soba_id, vlaznostvazduhasobe, datum) VALUES (%s, %s, %s);"
 )
+DELETE_SOBA_BY_ID = ("DELETE FROM sobe WHERE id = '%s';")
+
+
 
 BROJ_DANA = (
     """SELECT COUNT(DISTINCT DATE(datum)) AS dani FROM vlaznostvazduha;"""
 )
 
+ 
 GLOBAL_PROSEK = """SELECT AVG(vlaznostvazduhasobe) as prosek FROM vlaznostvazduha;"""
 
 load_dotenv()
@@ -41,6 +45,8 @@ def create_soba():
             soba_id = cursor.fetchone()[0]
 
     return {"id": soba_id, "poruka": f"Soba {ime} je kreirana."}, 201
+
+
 
 @app.post("/api/vlaznostvazduha")
 def add_vlaznostvazduha():
@@ -70,6 +76,20 @@ def get_prosek():
             dani = cursor.fetchone()[0]
 
     return {"prosek": round(prosek, 2), "dani": dani}
+
+
+@app.delete("/api/sobe")
+def delete_soba():
+    data = request.get_json()
+    soba_id = data["id"]
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(DELETE_SOBA_BY_ID, (soba_id,))
+            deleted_count = cursor.rowcount
+        if deleted_count == 0:
+                return {"poruka": f"Soba sa id-jem {soba_id} ne postoji."}, 404
+
+    return {"poruka": f"Soba sa id-jem {soba_id} uspešno obrisana."}, 200
 
 if __name__ == "__main__":
     app.run(debug=True ,port=8080,use_reloader=False)
